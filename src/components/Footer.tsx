@@ -47,10 +47,16 @@ export default function Footer() {
       </Container>
 
       <div className="border-t border-border py-4">
-        <Container>
+        <Container className="flex flex-wrap items-center justify-between gap-2">
           <p className="text-xs text-foreground-muted">
             {year} {business.name}. All rights reserved.
           </p>
+          <Link
+            href="/admin"
+            className="text-xs text-foreground-muted underline underline-offset-2 hover:text-brand"
+          >
+            Staff login
+          </Link>
         </Container>
       </div>
     </footer>
