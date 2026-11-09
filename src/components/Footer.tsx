@@ -9,7 +9,7 @@ export default function Footer() {
     <footer className="mt-20 border-t border-border bg-surface">
       <Container className="grid gap-10 py-12 sm:grid-cols-3">
         <div>
-          <p className="font-display text-base font-semibold text-brand-800">
+          <p className="font-display text-base font-semibold text-brand-dark">
             {business.shortName}
           </p>
           <p className="mt-2 max-w-xs text-sm text-foreground-muted">
@@ -38,7 +38,7 @@ export default function Footer() {
           </p>
           <Link
             href="/property-records"
-            className="mt-2 inline-block text-sm text-brand-700 underline underline-offset-2 hover:text-brand-800"
+            className="mt-2 inline-block text-sm text-brand underline underline-offset-2 hover:text-brand-dark"
           >
             Look up your county property records
           </Link>

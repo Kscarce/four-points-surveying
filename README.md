@@ -21,10 +21,13 @@ until that switch is made deliberately.
 - Tailwind CSS 4
 - [Resend](https://resend.com/) for sending quote request emails
 - [Zod](https://zod.dev/) for form validation (shared client/server)
-- Self-hosted fonts via `@fontsource` (Public Sans, Zilla Slab),
+- Self-hosted fonts via `@fontsource` (Public Sans, Oswald),
   not Google Fonts, since the build environment this was developed in
   couldn't reach `fonts.googleapis.com`. Works fine either way, but
   worth knowing if fonts ever need to change.
+- Brand palette and typeface pairing are built around the client's
+  real logo (`public/brand/logo-mark.jpg`), colors sampled directly
+  from the file rather than guessed.
 
 ## Getting started
 
@@ -74,7 +77,10 @@ available yet, grep for `TODO` to find them in code, but the main ones:
   Caswell) link to the county's homepage rather than a confirmed
   direct GIS page, flagged with `verified: false`. Worth a few
   minutes finding the exact page for each.
-- **Logo**: currently text-only in the header, no image logo yet.
+- **Logo**: real logo (`logo-mark.jpg`) is in place in the header and
+  homepage hero. The wordmark variant (`logo-wordmark.jpg`) is saved
+  in `/public/brand/` but not yet used anywhere — could replace the
+  text wordmark in the header/footer if preferred.
 
 ## Project structure
 

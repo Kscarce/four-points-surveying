@@ -36,7 +36,7 @@ export default function Accordion({
                   viewBox="0 0 18 18"
                   fill="none"
                   aria-hidden="true"
-                  className={`shrink-0 text-brand-700 transition-transform duration-200 ${isOpen ? "rotate-45" : ""}`}
+                  className={`shrink-0 text-brand transition-transform duration-200 ${isOpen ? "rotate-45" : ""}`}
                 >
                   <path d="M9 2V16M2 9H16" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />
                 </svg>

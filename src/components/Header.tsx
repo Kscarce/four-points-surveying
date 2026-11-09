@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import Container from "./Container";
@@ -21,13 +22,22 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur">
-      <Container className="flex h-16 max-w-6xl items-center justify-between gap-4">
+      <Container className="flex h-20 max-w-6xl items-center justify-between gap-4">
         <Link
           href="/"
-          className="whitespace-nowrap font-display text-lg font-semibold text-brand-800"
+          className="flex items-center gap-2.5 whitespace-nowrap"
           onClick={() => setOpen(false)}
         >
-          {business.shortName}
+          <Image
+            src="/brand/logo-mark.jpg"
+            alt=""
+            width={44}
+            height={50}
+            className="h-11 w-auto"
+          />
+          <span className="font-display text-lg font-semibold uppercase tracking-tight text-foreground">
+            {business.shortName}
+          </span>
         </Link>
 
         <nav className="hidden items-center gap-5 lg:flex">
@@ -35,14 +45,14 @@ export default function Header() {
             <Link
               key={link.href}
               href={link.href}
-              className="whitespace-nowrap text-sm text-foreground-muted transition-colors hover:text-brand-700"
+              className="whitespace-nowrap text-sm text-foreground-muted transition-colors hover:text-brand"
             >
               {link.label}
             </Link>
           ))}
           <Link
             href="/contact"
-            className="whitespace-nowrap rounded-sm bg-brand-700 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-brand-800"
+            className="whitespace-nowrap rounded-sm bg-brand px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-brand-dark"
           >
             Request a quote
           </Link>
@@ -50,7 +60,7 @@ export default function Header() {
 
         <button
           type="button"
-          className="flex h-10 w-10 items-center justify-center text-brand-800 lg:hidden"
+          className="flex h-10 w-10 items-center justify-center text-brand-dark lg:hidden"
           aria-expanded={open}
           aria-controls="mobile-nav"
           aria-label={open ? "Close menu" : "Open menu"}
@@ -73,7 +83,7 @@ export default function Header() {
               <Link
                 key={link.href}
                 href={link.href}
-                className="rounded-sm px-2 py-2.5 text-base text-foreground-muted hover:bg-surface hover:text-brand-700"
+                className="rounded-sm px-2 py-2.5 text-base text-foreground-muted hover:bg-surface hover:text-brand"
                 onClick={() => setOpen(false)}
               >
                 {link.label}
@@ -81,7 +91,7 @@ export default function Header() {
             ))}
             <Link
               href="/contact"
-              className="mt-2 rounded-sm bg-brand-700 px-4 py-3 text-center text-base font-medium text-white"
+              className="mt-2 rounded-sm bg-brand px-4 py-3 text-center text-base font-medium text-white"
               onClick={() => setOpen(false)}
             >
               Request a quote

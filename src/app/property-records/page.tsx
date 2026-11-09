@@ -33,7 +33,7 @@ export default function PropertyRecordsPage() {
               href={item.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-sm text-brand-700 underline underline-offset-2 hover:text-brand-800"
+              className="text-sm text-brand underline underline-offset-2 hover:text-brand-dark"
             >
               Open GIS site
             </a>

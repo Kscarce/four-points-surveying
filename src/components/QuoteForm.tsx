@@ -7,7 +7,7 @@ import { counties } from "@/lib/content";
 type Status = "idle" | "submitting" | "success" | "error";
 
 const fieldClass =
-  "w-full border border-border bg-background px-3 py-2.5 text-sm text-foreground placeholder:text-foreground-muted/60 focus:border-brand-500";
+  "w-full border border-border bg-background px-3 py-2.5 text-sm text-foreground placeholder:text-foreground-muted/60 focus:border-brand";
 const labelClass = "mb-1.5 block text-sm font-medium text-foreground";
 
 export default function QuoteForm() {
@@ -48,18 +48,18 @@ export default function QuoteForm() {
 
   if (status === "success") {
     return (
-      <div className="border border-brand-200 bg-brand-50 p-6">
-        <p className="font-display text-lg font-semibold text-brand-800">
+      <div className="border border-border bg-brand-tint p-6">
+        <p className="font-display text-lg font-semibold text-brand-dark">
           Request sent
         </p>
-        <p className="mt-2 text-sm text-brand-800">
+        <p className="mt-2 text-sm text-brand-dark">
           Thanks, we&apos;ve got your request and will follow up soon. If
           it&apos;s urgent, feel free to call or text us directly.
         </p>
         <button
           type="button"
           onClick={() => setStatus("idle")}
-          className="mt-4 text-sm font-medium text-brand-700 underline underline-offset-2"
+          className="mt-4 text-sm font-medium text-brand underline underline-offset-2"
         >
           Send another request
         </button>
@@ -143,7 +143,7 @@ export default function QuoteForm() {
       <button
         type="submit"
         disabled={status === "submitting"}
-        className="rounded-sm bg-brand-700 px-5 py-3 text-sm font-medium text-white transition-colors hover:bg-brand-800 disabled:opacity-60"
+        className="rounded-sm bg-brand px-5 py-3 text-sm font-medium text-white transition-colors hover:bg-brand-dark disabled:opacity-60"
       >
         {status === "submitting" ? "Sending..." : "Send quote request"}
       </button>

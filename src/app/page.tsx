@@ -1,38 +1,47 @@
+import Image from "next/image";
 import Link from "next/link";
 import Section from "@/components/Section";
-import ContourLines from "@/components/ContourLines";
 import { business, counties, services, callForQuoteServices } from "@/lib/content";
 
 export default function Home() {
   return (
     <>
-      <div className="relative overflow-hidden border-b border-border bg-surface">
-        <ContourLines className="absolute inset-0 h-full w-full" />
-        <Section className="relative py-16 sm:py-24">
-          <div className="max-w-2xl">
-            <p className="text-sm font-medium text-brand-700">
-              {business.basedIn} &middot; Over 30 years of combined experience
-            </p>
-            <h1 className="mt-3 font-display text-4xl font-semibold leading-tight text-foreground sm:text-5xl">
-              {business.tagline}
-            </h1>
-            <p className="mt-5 max-w-xl text-base leading-relaxed text-foreground-muted">
-              {business.foundedBlurb}
-            </p>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Link
-                href="/contact"
-                className="rounded-sm bg-brand-700 px-5 py-3 text-sm font-medium text-white transition-colors hover:bg-brand-800"
-              >
-                Request a quote
-              </Link>
-              <Link
-                href="/services"
-                className="rounded-sm border border-border bg-background px-5 py-3 text-sm font-medium text-foreground transition-colors hover:border-brand-400"
-              >
-                See services & prices
-              </Link>
+      <div className="border-b-4 border-foreground bg-surface">
+        <Section className="py-14 sm:py-20">
+          <div className="grid items-center gap-10 sm:grid-cols-[1fr_auto]">
+            <div className="max-w-2xl">
+              <p className="text-sm font-medium text-brand">
+                {business.basedIn} &middot; Over 30 years of combined experience
+              </p>
+              <h1 className="mt-3 font-display text-4xl font-semibold uppercase leading-tight tracking-tight text-foreground sm:text-5xl">
+                {business.tagline}
+              </h1>
+              <p className="mt-5 max-w-xl text-base leading-relaxed text-foreground-muted">
+                {business.foundedBlurb}
+              </p>
+              <div className="mt-8 flex flex-wrap gap-3">
+                <Link
+                  href="/contact"
+                  className="rounded-sm bg-brand px-5 py-3 text-sm font-medium text-white transition-colors hover:bg-brand-dark"
+                >
+                  Request a quote
+                </Link>
+                <Link
+                  href="/services"
+                  className="rounded-sm border-2 border-foreground bg-background px-5 py-3 text-sm font-medium text-foreground transition-colors hover:border-brand hover:text-brand"
+                >
+                  See services & prices
+                </Link>
+              </div>
             </div>
+            <Image
+              src="/brand/logo-mark.jpg"
+              alt={`${business.name} logo`}
+              width={200}
+              height={227}
+              priority
+              className="hidden h-auto w-40 shrink-0 sm:block md:w-48"
+            />
           </div>
         </Section>
       </div>
@@ -47,7 +56,7 @@ export default function Home() {
               <h3 className="font-display text-lg font-semibold text-foreground">
                 {service.name}
               </h3>
-              <p className="mt-1 text-sm font-medium text-brand-700">
+              <p className="mt-1 text-sm font-medium text-brand">
                 Starting at ${service.startingPrice.toLocaleString()}
               </p>
               <p className="mt-3 text-sm leading-relaxed text-foreground-muted">
@@ -94,7 +103,7 @@ export default function Home() {
             </p>
             <Link
               href="/contact"
-              className="mt-4 inline-block text-sm font-medium text-brand-700 underline underline-offset-2 hover:text-brand-800"
+              className="mt-4 inline-block text-sm font-medium text-brand underline underline-offset-2 hover:text-brand-dark"
             >
               Get in touch
             </Link>

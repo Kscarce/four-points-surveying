@@ -29,7 +29,7 @@ export default function ServicesPage() {
               <h2 className="font-display text-xl font-semibold text-foreground">
                 {service.name}
               </h2>
-              <p className="font-display text-xl font-semibold text-brand-700">
+              <p className="font-display text-xl font-semibold text-brand">
                 Starting at ${service.startingPrice.toLocaleString()}
               </p>
             </div>
@@ -39,7 +39,7 @@ export default function ServicesPage() {
             <ul className="mt-4 grid gap-x-6 gap-y-1.5 text-sm text-foreground sm:grid-cols-2">
               {service.highlights.map((item) => (
                 <li key={item} className="flex gap-2">
-                  <span aria-hidden="true" className="text-brand-600">&bull;</span>
+                  <span aria-hidden="true" className="text-brand">&bull;</span>
                   {item}
                 </li>
               ))}
@@ -59,7 +59,7 @@ export default function ServicesPage() {
           <ul className="mt-3 grid gap-x-6 gap-y-1.5 text-sm text-foreground sm:grid-cols-2">
             {callForQuoteServices.map((item) => (
               <li key={item} className="flex gap-2">
-                <span aria-hidden="true" className="text-brand-600">&bull;</span>
+                <span aria-hidden="true" className="text-brand">&bull;</span>
                 {item}
               </li>
             ))}
@@ -75,7 +75,7 @@ export default function ServicesPage() {
       <div className="mt-10 border-t border-border pt-8">
         <Link
           href="/contact"
-          className="inline-block rounded-sm bg-brand-700 px-5 py-3 text-sm font-medium text-white transition-colors hover:bg-brand-800"
+          className="inline-block rounded-sm bg-brand px-5 py-3 text-sm font-medium text-white transition-colors hover:bg-brand-dark"
         >
           Request a quote
         </Link>
