@@ -162,6 +162,15 @@ export async function getOpenQuoteRequests(): Promise<StoredQuoteRequest[]> {
     .filter((q) => q.quoteId && (q.status === "New" || q.status === "Quoted"));
 }
 
+// Accepted (signed) quote requests — these are real, paid-up jobs, so
+// this is what the schedule's "Job / customer" dropdown is built from.
+export async function getAcceptedQuoteRequests(): Promise<StoredQuoteRequest[]> {
+  const rows = await getAllRows();
+  return rows
+    .map(({ row }) => rowToStoredQuoteRequest(row))
+    .filter((q) => q.quoteId && q.status === "Accepted");
+}
+
 export async function getQuoteRequestById(
   quoteId: string,
 ): Promise<StoredQuoteRequest | null> {

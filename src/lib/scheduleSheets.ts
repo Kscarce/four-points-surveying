@@ -24,12 +24,13 @@ const COLUMNS = [
   "Date",
   "Time",
   "Job / Customer",
+  "County",
   "Assigned Worker",
   "Location",
   "Notes",
 ] as const;
 
-const SHEET_RANGE = `Schedule!A:${String.fromCharCode(64 + COLUMNS.length)}`; // A:G
+const SHEET_RANGE = `Schedule!A:${String.fromCharCode(64 + COLUMNS.length)}`; // A:H
 
 function getAuth() {
   const email = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
@@ -57,6 +58,7 @@ function rowToScheduleEntry(row: string[]): ScheduleEntry {
     date: get("Date"),
     time: get("Time"),
     job: get("Job / Customer"),
+    county: get("County"),
     worker: (get("Assigned Worker") || "Unassigned") as ScheduleEntry["worker"],
     location: get("Location"),
     notes: get("Notes"),
@@ -92,6 +94,7 @@ export async function createScheduleEntry(
     data.date,
     data.time ?? "",
     data.job,
+    data.county ?? "",
     data.worker,
     data.location ?? "",
     data.notes ?? "",
@@ -105,7 +108,14 @@ export async function createScheduleEntry(
     requestBody: { values: [row] },
   });
 
-  return { entryId, ...data };
+  return {
+    entryId,
+    ...data,
+    time: data.time ?? "",
+    county: data.county ?? "",
+    location: data.location ?? "",
+    notes: data.notes ?? "",
+  };
 }
 
 export async function updateScheduleEntry(
@@ -121,13 +131,14 @@ export async function updateScheduleEntry(
 
   await sheets.spreadsheets.values.update({
     spreadsheetId: getSheetId(),
-    range: `Schedule!B${sheetRowNumber}:G${sheetRowNumber}`,
+    range: `Schedule!B${sheetRowNumber}:H${sheetRowNumber}`,
     valueInputOption: "USER_ENTERED",
     requestBody: {
       values: [[
         data.date,
         data.time ?? "",
         data.job,
+        data.county ?? "",
         data.worker,
         data.location ?? "",
         data.notes ?? "",

@@ -3,6 +3,7 @@ import Section from "@/components/Section";
 import ScheduleCalendar from "@/components/ScheduleCalendar";
 import AdminSignOutButton from "@/components/AdminSignOutButton";
 import { getScheduleEntries, isScheduleConfigured } from "@/lib/scheduleSheets";
+import { getAcceptedQuoteRequests, isSheetsConfigured } from "@/lib/googleSheets";
 
 export const dynamic = "force-dynamic";
 
@@ -22,6 +23,10 @@ export default async function SchedulePage() {
   }
 
   const entries = await getScheduleEntries();
+  // The accepted-quotes dropdown is a nice-to-have on top of the core
+  // schedule feature, so a Sheets hiccup there shouldn't take down the
+  // whole page, it should just fall back to typing the job in by hand.
+  const acceptedQuotes = isSheetsConfigured() ? await getAcceptedQuoteRequests() : [];
 
   return (
     <Section>
@@ -45,7 +50,7 @@ export default async function SchedulePage() {
       </div>
 
       <div className="mt-8">
-        <ScheduleCalendar initialEntries={entries} />
+        <ScheduleCalendar initialEntries={entries} acceptedQuotes={acceptedQuotes} />
       </div>
     </Section>
   );

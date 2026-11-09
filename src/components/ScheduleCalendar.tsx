@@ -2,17 +2,49 @@
 
 import { useMemo, useState } from "react";
 import {
+  scheduleCountyOptions,
   scheduleWorkerOptions,
   type ScheduleEntry,
   type ScheduleEntryInput,
 } from "@/lib/scheduleSchema";
+import type { StoredQuoteRequest } from "@/lib/quoteSchema";
 
-const WORKER_DOT: Record<string, string> = {
-  Matt: "bg-brand",
-  Jon: "bg-amber-600",
-  Jerrett: "bg-sky-600",
-  Unassigned: "bg-foreground-muted",
+const MANUAL_JOB = "__manual__";
+
+function jobLabel(quote: StoredQuoteRequest): string {
+  return `${quote.name} — ${quote.propertyAddress}`;
+}
+
+// A county string from a quote request (free text from whoever filled
+// the form in) doesn't always exactly match one of the fixed schedule
+// county options, so only carry it over automatically when it does.
+function matchCounty(raw: string): (typeof scheduleCountyOptions)[number] | "" {
+  const match = scheduleCountyOptions.find(
+    (c) => c.toLowerCase() === raw.trim().toLowerCase(),
+  );
+  return match ?? "";
+}
+
+// Jobs are color-coded by county on the calendar, since that's what the
+// crew actually plans their day around. Guilford (where the business is
+// based) gets the brand green; the rest are a spread of distinct hues so
+// adjacent counties on the list don't read as near-identical at a glance.
+const COUNTY_COLOR: Record<string, string> = {
+  Alamance: "#DC2626",
+  Caswell: "#EA580C",
+  Davidson: "#CA8A04",
+  Forsyth: "#65A30D",
+  Guilford: "#1A5E3C",
+  Randolph: "#0D9488",
+  Rockingham: "#2563EB",
+  Stokes: "#7C3AED",
+  Other: "#DB2777",
 };
+const NO_COUNTY_COLOR = "#9CA3AF";
+
+function countyColor(county: string): string {
+  return COUNTY_COLOR[county] ?? NO_COUNTY_COLOR;
+}
 
 const WEEKDAY_LABELS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
@@ -47,6 +79,7 @@ const emptyForm = (date: string): FormState => ({
   date,
   time: "",
   job: "",
+  county: "",
   worker: "Unassigned",
   location: "",
   notes: "",
@@ -54,8 +87,10 @@ const emptyForm = (date: string): FormState => ({
 
 export default function ScheduleCalendar({
   initialEntries,
+  acceptedQuotes,
 }: {
   initialEntries: ScheduleEntry[];
+  acceptedQuotes: StoredQuoteRequest[];
 }) {
   const [entries, setEntries] = useState(initialEntries);
   const now = new Date();
@@ -69,6 +104,10 @@ export default function ScheduleCalendar({
   const [form, setForm] = useState<FormState>(emptyForm(todayKey()));
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  // Which quote the "Job / customer" dropdown has selected, or
+  // MANUAL_JOB when typing the job name in by hand instead (the only
+  // option when there are no accepted quotes yet).
+  const [jobSelection, setJobSelection] = useState<string>(MANUAL_JOB);
 
   const grid = useMemo(() => buildMonthGrid(viewYear, viewMonth), [viewYear, viewMonth]);
 
@@ -104,6 +143,8 @@ export default function ScheduleCalendar({
   function openAddForm(date: string) {
     setEditingId(null);
     setForm(emptyForm(date));
+    // Default to the dropdown when there's something to pick from.
+    setJobSelection(MANUAL_JOB);
     setFormOpen(true);
     setError("");
   }
@@ -114,10 +155,14 @@ export default function ScheduleCalendar({
       date: entry.date,
       time: entry.time,
       job: entry.job,
-      worker: entry.worker,
+      county: entry.county as FormState["county"],
+      worker: entry.worker as FormState["worker"],
       location: entry.location,
       notes: entry.notes,
     });
+    // An existing entry isn't linked back to a specific quote, so edit
+    // always starts in manual mode with the current text filled in.
+    setJobSelection(MANUAL_JOB);
     setFormOpen(true);
     setError("");
   }
@@ -126,6 +171,19 @@ export default function ScheduleCalendar({
     setFormOpen(false);
     setEditingId(null);
     setError("");
+  }
+
+  function handleJobSelect(value: string) {
+    setJobSelection(value);
+    if (value === MANUAL_JOB) return;
+    const quote = acceptedQuotes.find((q) => q.quoteId === value);
+    if (!quote) return;
+    setForm((f) => ({
+      ...f,
+      job: jobLabel(quote),
+      location: quote.propertyAddress,
+      county: matchCounty(quote.county ?? "") || f.county,
+    }));
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -240,7 +298,19 @@ export default function ScheduleCalendar({
         </div>
       </div>
 
-      <div className="mt-4 grid grid-cols-7 gap-px overflow-hidden border border-border bg-border text-xs">
+      <div className="mt-4 flex flex-wrap gap-x-3 gap-y-1 text-[11px] text-foreground-muted">
+        {scheduleCountyOptions.map((county) => (
+          <span key={county} className="flex items-center gap-1">
+            <span
+              className="h-2 w-2 shrink-0 rounded-full"
+              style={{ backgroundColor: countyColor(county) }}
+            />
+            {county}
+          </span>
+        ))}
+      </div>
+
+      <div className="mt-3 grid grid-cols-7 gap-px overflow-hidden border border-border bg-border text-xs">
         {WEEKDAY_LABELS.map((label) => (
           <div key={label} className="bg-surface px-1.5 py-1.5 text-center font-medium text-foreground-muted">
             {label}
@@ -271,7 +341,10 @@ export default function ScheduleCalendar({
               <div className="mt-1 space-y-0.5">
                 {dayEntries.slice(0, 3).map((entry) => (
                   <div key={entry.entryId} className="flex items-center gap-1 truncate text-[11px] text-foreground-muted">
-                    <span className={`h-1.5 w-1.5 shrink-0 ${WORKER_DOT[entry.worker] ?? "bg-foreground-muted"}`} />
+                    <span
+                      className="h-1.5 w-1.5 shrink-0 rounded-full"
+                      style={{ backgroundColor: countyColor(entry.county) }}
+                    />
                     <span className="truncate">{entry.job}</span>
                   </div>
                 ))}
@@ -311,12 +384,16 @@ export default function ScheduleCalendar({
             <li key={entry.entryId} className="flex items-start justify-between gap-3 border border-border px-3 py-2">
               <div className="min-w-0">
                 <p className="flex items-center gap-1.5 text-sm font-medium text-foreground">
-                  <span className={`h-2 w-2 shrink-0 ${WORKER_DOT[entry.worker] ?? "bg-foreground-muted"}`} />
+                  <span
+                    className="h-2 w-2 shrink-0 rounded-full"
+                    style={{ backgroundColor: countyColor(entry.county) }}
+                  />
                   {entry.job}
                   {entry.time && <span className="font-normal text-foreground-muted">&middot; {entry.time}</span>}
                 </p>
                 <p className="text-xs text-foreground-muted">
                   {entry.worker}
+                  {entry.county && ` · ${entry.county} County`}
                   {entry.location && ` · ${entry.location}`}
                 </p>
                 {entry.notes && <p className="mt-1 text-xs text-foreground-muted">{entry.notes}</p>}
@@ -359,16 +436,65 @@ export default function ScheduleCalendar({
 
             <div>
               <label className="mb-1 block text-xs font-medium text-foreground">Job / customer</label>
-              <input
-                type="text"
-                required
-                value={form.job}
-                onChange={(e) => setForm((f) => ({ ...f, job: e.target.value }))}
-                className="w-full border border-border bg-background px-2 py-1.5 text-sm text-foreground focus:border-brand"
-              />
+              {acceptedQuotes.length > 0 ? (
+                <>
+                  <select
+                    value={jobSelection}
+                    onChange={(e) => handleJobSelect(e.target.value)}
+                    className="w-full border border-border bg-background px-2 py-1.5 text-sm text-foreground focus:border-brand"
+                  >
+                    <option value={MANUAL_JOB}>Type a job in manually&hellip;</option>
+                    {acceptedQuotes.map((quote) => (
+                      <option key={quote.quoteId} value={quote.quoteId}>
+                        {jobLabel(quote)}
+                      </option>
+                    ))}
+                  </select>
+                  {jobSelection === MANUAL_JOB && (
+                    <input
+                      type="text"
+                      required
+                      autoFocus
+                      placeholder="Job or customer name"
+                      value={form.job}
+                      onChange={(e) => setForm((f) => ({ ...f, job: e.target.value }))}
+                      className="mt-2 w-full border border-border bg-background px-2 py-1.5 text-sm text-foreground focus:border-brand"
+                    />
+                  )}
+                </>
+              ) : (
+                <input
+                  type="text"
+                  required
+                  value={form.job}
+                  onChange={(e) => setForm((f) => ({ ...f, job: e.target.value }))}
+                  className="w-full border border-border bg-background px-2 py-1.5 text-sm text-foreground focus:border-brand"
+                />
+              )}
+              {acceptedQuotes.length === 0 && (
+                <p className="mt-1 text-[11px] text-foreground-muted">
+                  No accepted quotes yet to pick from &mdash; jobs show up here once a customer
+                  accepts a work order.
+                </p>
+              )}
             </div>
 
             <div className="grid gap-3 sm:grid-cols-2">
+              <div>
+                <label className="mb-1 block text-xs font-medium text-foreground">County</label>
+                <select
+                  value={form.county}
+                  onChange={(e) => setForm((f) => ({ ...f, county: e.target.value as FormState["county"] }))}
+                  className="w-full border border-border bg-background px-2 py-1.5 text-sm text-foreground focus:border-brand"
+                >
+                  <option value="">Unspecified</option>
+                  {scheduleCountyOptions.map((c) => (
+                    <option key={c} value={c}>
+                      {c}
+                    </option>
+                  ))}
+                </select>
+              </div>
               <div>
                 <label className="mb-1 block text-xs font-medium text-foreground">Assigned to</label>
                 <select
