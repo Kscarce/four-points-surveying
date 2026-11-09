@@ -36,10 +36,16 @@ export default function ContactPage() {
                 <li key={member.name}>
                   <span className="font-medium text-foreground">{member.name}</span>
                   {member.preferred && (
-                    <span className="ml-1.5 text-xs text-brand">(fastest response)</span>
+                    <span className="ml-1.5 text-xs text-brand">(text for fastest response)</span>
                   )}
                   <br />
                   {member.phone}
+                  {member.email && (
+                    <>
+                      <br />
+                      {member.email}
+                    </>
+                  )}
                 </li>
               ))}
             </ul>

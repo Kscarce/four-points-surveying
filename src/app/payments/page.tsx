@@ -32,7 +32,7 @@ export default function PaymentsPage() {
 
       <p className="mt-8 text-sm text-foreground-muted">
         Questions about an invoice or payment? Contact {business.team[0].name}{" "}
-        at {business.team[0].phone}.
+        at {business.team[0].phone} or {business.team[0].email}.
       </p>
     </Section>
   );

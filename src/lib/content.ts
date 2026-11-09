@@ -16,9 +16,9 @@ export const business = {
   // form until a QUOTE_NOTIFY_EMAIL env var is set.
   email: "matt@4ptss.com",
   team: [
-    { name: "Matt", role: "Surveyor", phone: "336.669.0209", preferred: true },
-    { name: "Jon", role: "Surveyor", phone: "336.669.7741", preferred: false },
-    { name: "Jerrett", role: "Surveyor", phone: "336.349.8840", preferred: false },
+    { name: "Matt", role: "Surveyor", phone: "336.669.0209", email: "matt@4ptss.com", preferred: true },
+    { name: "Jon", role: "Surveyor", phone: "336.669.7741", email: "", preferred: false },
+    { name: "Jerrett", role: "Surveyor", phone: "336.349.8840", email: "", preferred: false },
   ],
   licensedSurveyor: "Gregory Matthew Gorrell, PLS",
 } as const;
@@ -62,12 +62,12 @@ export const services = [
     name: "Residential lot / loan survey",
     startingPrice: 500,
     description:
-      "Our lot-loan surveys include six full-color photos with point-of-view references to help you locate your property corners, plus large maps sized at 11\" x 17\" that are easy to read and understand. We offer fast turnaround for loan closings and will deliver the survey to your closing attorney or real estate agent. Digital copies are available alongside paper copies.",
+      "Our lot-loan surveys include six full-color photos with point-of-view references to help you locate your property corners, plus a digital map that's easy to read and understand. We offer fast turnaround for loan closings and can work with your closing attorney or real estate agent. Digital copies of the map and the report will be provided.",
     highlights: [
       "Six full-color corner photos included",
-      "11\" x 17\" maps for easy reading",
+      "Easy-to-read digital map",
       "Fast turnaround for loan closings",
-      "Digital copy available on request",
+      "Digital copies of map and report provided",
     ],
   },
   {
@@ -107,7 +107,7 @@ export const faqs = [
   {
     question: "What's included in your surveys?",
     answer:
-      "Our surveys show all existing structures with dimensions to each property line, all property line dimensions and bearings, road rights-of-way and easements, driveways, walkways, and fences. We also include six full-color photos of the property corners so you can relocate them later without paying for another survey visit. At the property itself, corners are marked with flags.",
+      "Our surveys show all existing structures with dimensions to each property line, all property line dimensions and bearings, road rights-of-way and easements, driveways, walkways, and fences. We also include six full-color photos of the property corners so you can relocate them later without paying for another survey visit. At the property itself, corners are marked with flags. We also keep your corner records on file long after the survey is done, so we can help you go back and find them again years later.",
   },
   {
     question: "Why does the county's GIS website show the property line running through my house, garage, driveway, or fence?",

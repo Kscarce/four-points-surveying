@@ -25,6 +25,7 @@ export default function Footer() {
             {business.team.map((member) => (
               <li key={member.name}>
                 {member.name}: {member.phone}
+                {member.email && ` · ${member.email}`}
               </li>
             ))}
             <li className="pt-1">{business.hours}</li>

@@ -18,8 +18,7 @@ export default function PropertyRecordsPage() {
         property? Each county below runs its own GIS and property
         records system. Keep in mind that county GIS maps are useful for
         ownership and tax information, but they are not an accurate
-        source for exact property lines, deed conditions can affect the
-        actual boundary in ways a map alone won&apos;t show. For a legally
+        source for exact property lines. For a legally
         accurate boundary, you&apos;ll still need a licensed survey.
       </p>
 

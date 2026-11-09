@@ -120,11 +120,11 @@ export default function QuoteForm() {
 
       <div className="border border-border bg-surface p-4">
         <p className="text-sm leading-relaxed text-foreground-muted">
-          Every survey includes finding and setting all property corners
-          that aren&apos;t already marked. That&apos;s standard. Some
-          customers also want wood stakes placed along the property
-          lines between corners, not just at the corners themselves.
-          That&apos;s a separate option and usually costs more.
+          Every survey includes finding and setting any missing property
+          corners. Some customers also want wood stakes placed along
+          the property lines between corners, not just at the corners
+          themselves. That&apos;s a separate option and usually costs
+          more.
         </p>
         <label htmlFor="wantsLineStakes" className="mt-3 flex items-start gap-2.5 text-sm text-foreground">
           <input
