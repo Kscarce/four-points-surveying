@@ -35,7 +35,7 @@ export default function Header() {
             className="h-11 w-auto"
           />
           <span className="font-display text-lg font-semibold uppercase tracking-tight text-foreground">
-            {business.shortName}
+            {business.name}
           </span>
         </Link>
 
