@@ -19,8 +19,8 @@ export const business = {
   email: "PLACEHOLDER-confirm-real-email@4ptss.com",
   team: [
     { name: "Matt", role: "Surveyor", phone: "336.669.0209", preferred: true },
-    { name: "Jon", role: "Surveyor", phone: "336.669.7741" },
-    { name: "Jerrett", role: "Surveyor", phone: "336.349.8840" },
+    { name: "Jon", role: "Surveyor", phone: "336.669.7741", preferred: false },
+    { name: "Jerrett", role: "Surveyor", phone: "336.349.8840", preferred: false },
   ],
   licensedSurveyor: "Gregory Matthew Gorrell, PLS",
 } as const;

@@ -1,36 +1,89 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Four Points Surveyors
 
-## Getting Started
+A rebuild of the website for Four Points Surveyors, PLLC, a land
+surveying company serving the Piedmont Triad region of North
+Carolina. Replaces the previous Weebly-based site with a modern,
+mobile-friendly site and an automated quote request flow.
 
-First, run the development server:
+## Status
+
+Phase 1 in progress: public site rebuild + quote request form.
+See `PLAN.md` for the full phased plan (site, then quote-to-work-order
+automation, then an internal records lookup tool).
+
+This has **not replaced the live site yet**. It's being built and
+reviewed here first; `4ptss.com` still points at the old Weebly site
+until that switch is made deliberately.
+
+## Stack
+
+- [Next.js 16](https://nextjs.org/) (App Router) + TypeScript
+- Tailwind CSS 4
+- [Resend](https://resend.com/) for sending quote request emails
+- [Zod](https://zod.dev/) for form validation (shared client/server)
+- Self-hosted fonts via `@fontsource` (Public Sans, Zilla Slab),
+  not Google Fonts, since the build environment this was developed in
+  couldn't reach `fonts.googleapis.com`. Works fine either way, but
+  worth knowing if fonts ever need to change.
+
+## Getting started
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open http://localhost:3000.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Environment variables (quote request emails)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+The quote request form (`/contact`) posts to `/api/quote`, which sends
+an email via Resend. Without these set, the form still works and
+validates input, but submissions will fail with a clear "not
+configured" error instead of silently disappearing:
 
-## Learn More
+```bash
+# .env.local
+RESEND_API_KEY=your_resend_api_key
+QUOTE_FROM_EMAIL="Four Points Surveyors <quotes@yourdomain.com>"
+QUOTE_NOTIFY_EMAIL=the-real-inbox-to-receive-requests@example.com
+```
 
-To learn more about Next.js, take a look at the following resources:
+`QUOTE_FROM_EMAIL` needs to be on a domain verified in Resend. `QUOTE_NOTIFY_EMAIL`
+is where new quote requests land, if unset it falls back to the
+placeholder email in `src/lib/content.ts`, which **should be replaced**
+before this goes live.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Known placeholders / TODOs before launch
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+A few things are intentionally stubbed because the real material wasn't
+available yet, grep for `TODO` to find them in code, but the main ones:
 
-## Deploy on Vercel
+- **Business email** (`src/lib/content.ts`): the live site obfuscates
+  its email against scrapers, so the real address was never scraped.
+  Needs the real inbox.
+- **Example survey image** (`src/app/examples/page.tsx`): placeholder
+  schematic graphic, swap in the real example survey photo.
+- **Work order PDF** (`src/app/downloads/page.tsx`): the current site
+  links to `work_order_sheet_2024.pdf`, which wasn't available to pull
+  in automatically. Either drop the real file in
+  `/public/forms/work-order.pdf` and link it, or skip straight to the
+  online work order flow planned for Phase 3.
+- **Property records county links** (`src/lib/content.ts`,
+  `countyGisLinks`): 4 of 8 counties (Rockingham, Davidson, Stokes,
+  Caswell) link to the county's homepage rather than a confirmed
+  direct GIS page, flagged with `verified: false`. Worth a few
+  minutes finding the exact page for each.
+- **Logo**: currently text-only in the header, no image logo yet.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Project structure
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```
+src/
+  app/            Pages (one folder per route)
+  app/api/quote/  Quote request form handler
+  components/     Shared UI (Header, Footer, Accordion, QuoteForm, ...)
+  lib/content.ts  All business content (services, prices, FAQ, counties, ...)
+                  Edit this file to change site copy without touching layout code.
+  lib/quoteSchema.ts  Validation schema shared by the form and the API route
+```
