@@ -3,6 +3,7 @@ import { Resend } from "resend";
 import { quoteRequestSchema } from "@/lib/quoteSchema";
 import { business } from "@/lib/content";
 import { generateQuotePdf } from "@/lib/generateQuotePdf";
+import { appendQuoteRequestRow, isSheetsConfigured } from "@/lib/googleSheets";
 
 // Basic in-memory rate limiting per server instance. Not a substitute
 // for a real rate limiter behind a CDN, but enough to stop naive form
@@ -53,6 +54,18 @@ export async function POST(request: NextRequest) {
   }
 
   const data = parsed.data;
+
+  // Log to the Google Sheet independent of whether email is configured
+  // below, that way requests still get recorded even before Resend is
+  // fully set up. Best effort: a Sheets failure shouldn't block the
+  // customer's request or the email notification.
+  if (isSheetsConfigured()) {
+    try {
+      await appendQuoteRequestRow(data);
+    } catch (err) {
+      console.error("Failed to log quote request to Google Sheets:", err);
+    }
+  }
 
   const notifyTo = process.env.QUOTE_NOTIFY_EMAIL || business.email;
   const fromAddress = process.env.QUOTE_FROM_EMAIL;

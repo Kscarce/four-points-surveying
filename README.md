@@ -56,6 +56,53 @@ QUOTE_NOTIFY_EMAIL=the-real-inbox-to-receive-requests@example.com
 is where new quote requests land, if unset it falls back to
 `business.email` in `src/lib/content.ts` (`matt@4ptss.com`).
 
+## Google Sheets logging (optional)
+
+Separate from email, every quote request can also be logged as a row
+in a Google Sheet (status, price, etc. are columns Matt can fill in by
+hand — this is what Phase 3's accept flow reads from). This is
+optional: without it configured, the form still works exactly as
+above, just without the Sheet row.
+
+```bash
+# .env.local
+GOOGLE_SHEET_ID=the_id_from_the_sheets_url
+GOOGLE_SERVICE_ACCOUNT_EMAIL=something@your-project.iam.gserviceaccount.com
+GOOGLE_SERVICE_ACCOUNT_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
+```
+
+How to get these three values:
+
+1. In [Google Cloud Console](https://console.cloud.google.com), create
+   a project, then enable the **Google Sheets API** for it.
+2. Create a **service account** (IAM & Admin → Service Accounts). This
+   is a robot identity, independent of any one person's Google
+   login — that's what lets the Sheet later be swapped from a
+   development one to Matt's real one without touching any code, by
+   just sharing the new Sheet with the same service account.
+3. Generate a **JSON key** for it (Keys tab → Add key → JSON). Open
+   the downloaded file:
+   - `GOOGLE_SERVICE_ACCOUNT_EMAIL` is its `client_email` field.
+   - `GOOGLE_SERVICE_ACCOUNT_KEY` is its `private_key` field, exactly
+     as written (the `\n` sequences in it are literal, keep them).
+4. Create a Google Sheet, **share it with that service account's
+   email as an Editor** (same as sharing with a person), and copy the
+   long ID out of its URL (between `/d/` and `/edit`) into
+   `GOOGLE_SHEET_ID`.
+5. Row 1 should have these column headers, in order: `Timestamp`,
+   `Status`, `Name`, `Phone`, `Email`, `Property Address`, `County`,
+   `Survey Type`, `Wood Stakes Along Lines`, `Acreage`, `Timeline`,
+   `Notes`, `Price`, `Work Order Sent`.
+
+A development Sheet (Kaylee's own account) was created this way while
+building this. Switching to Matt's own Sheet later is just steps 4-5
+again on his account, then updating `GOOGLE_SHEET_ID` — no code
+changes.
+
+**Never commit the service account's JSON key or its private key value
+to git.** It only belongs in `.env.local` (already gitignored) and in
+Vercel's environment variable settings.
+
 ## Known placeholders / TODOs before launch
 
 A few things are intentionally stubbed because the real material wasn't
