@@ -33,3 +33,18 @@ export const quoteRequestSchema = z.object({
 });
 
 export type QuoteRequest = z.infer<typeof quoteRequestSchema>;
+
+// A logged quote request as stored in the Sheet: the submitted data
+// plus the server-assigned id and whatever Matt/the customer have
+// done with it since (price, signature, decision).
+export type StoredQuoteRequest = QuoteRequest & {
+  quoteId: string;
+  timestamp: string;
+  status: string;
+  price: string;
+  workOrderSent: string;
+  signedByName: string;
+  signedAt: string;
+  signedIp: string;
+  declineReason: string;
+};

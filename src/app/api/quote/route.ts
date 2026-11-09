@@ -54,6 +54,11 @@ export async function POST(request: NextRequest) {
   }
 
   const data = parsed.data;
+  // Assigned here (not by the Sheet) so it exists the moment the
+  // request is logged, and so the Phase 3 admin/work-order flow has a
+  // stable id to look the row up by that never changes even if rows
+  // get reordered or re-sorted in the Sheet later.
+  const quoteId = crypto.randomUUID();
 
   // Log to the Google Sheet independent of whether email is configured
   // below, that way requests still get recorded even before Resend is
@@ -61,7 +66,7 @@ export async function POST(request: NextRequest) {
   // customer's request or the email notification.
   if (isSheetsConfigured()) {
     try {
-      await appendQuoteRequestRow(data);
+      await appendQuoteRequestRow(data, quoteId);
     } catch (err) {
       console.error("Failed to log quote request to Google Sheets:", err);
     }

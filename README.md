@@ -7,9 +7,8 @@ mobile-friendly site and an automated quote request flow.
 
 ## Status
 
-Phase 1 in progress: public site rebuild + quote request form.
-See `PLAN.md` for the full phased plan (site, then quote-to-work-order
-automation, then an internal records lookup tool).
+Phase 1 (public site + quote request form) and Phase 3 (quote-to-work-order
+automation) are both in place. See `PLAN.md` for the full phased plan.
 
 This has **not replaced the live site yet**. It's being built and
 reviewed here first; `4ptss.com` still points at the old Weebly site
@@ -102,6 +101,64 @@ changes.
 **Never commit the service account's JSON key or its private key value
 to git.** It only belongs in `.env.local` (already gitignored) and in
 Vercel's environment variable settings.
+
+## Quote-to-work-order automation (Phase 3)
+
+Replaces Matt's old hand-filled PDF work order. Once a quote request
+comes in, Matt sets a price and the customer gets a link to review
+everything they submitted plus the price, and accept (with an
+e-signature) or decline — no retyping anything.
+
+**The flow:**
+
+1. Customer submits a quote request (as above) — logged to the Sheet
+   with a unique `Quote ID`.
+2. Matt signs in at `/admin`, sees open requests, types a price, and
+   clicks "Send work order." This updates the Sheet and emails the
+   customer a secure link.
+3. The customer opens `/work-order/[token]`, reviews the details and
+   price, and clicks **Accept** (types their name, checks an
+   agreement box) or **Decline**.
+4. On accept: their name, a timestamp, and their IP address are
+   recorded (the e-signature audit trail), a PDF of the whole
+   agreement is generated and emailed to both Matt and the customer,
+   and the Sheet is updated. On decline: Matt just gets notified.
+
+**Legal basis:** North Carolina's Uniform Electronic Transactions Act
+(UETA, N.C.G.S. Chapter 66, Article 40) and the federal ESIGN Act make
+this kind of electronic signature just as enforceable as a wet
+signature on an ordinary service contract, as long as there's clear
+intent to sign (typed name + checkbox + explicit Accept button),
+the signature is attributable to the signer (name, timestamp, IP on
+record), and both parties can get an accessible, reproducible copy
+(the emailed PDF covers this). None of UETA/ESIGN's excluded document
+categories (wills, family law filings, eviction/foreclosure/utility
+shutoff notices, etc.) apply to a survey work order. This is general
+information, not legal advice — if Matt wants a final sanity check on
+the exact wording, his insurance agent or a local attorney can take a
+quick look.
+
+**Required env vars** (beyond the ones above):
+
+```bash
+# .env.local
+ADMIN_PASSWORD=choose-a-password
+ADMIN_SESSION_SECRET=generate-with-openssl-rand--hex-32
+WORK_ORDER_TOKEN_SECRET=generate-with-openssl-rand--hex-32
+```
+
+`ADMIN_PASSWORD` is the shared password for `/admin` (there's one
+user, so a single password rather than real accounts is the right
+amount of complexity here). `ADMIN_SESSION_SECRET` and
+`WORK_ORDER_TOKEN_SECRET` are each any long random string — generate
+one with `openssl rand -hex 32` — used to sign the admin session
+cookie and the customer-facing work order links respectively so
+neither can be forged. Work order links expire 30 days after being
+sent.
+
+Without these set, `/admin` isn't reachable and the whole Phase 3 flow
+is simply unavailable — email and the quote form itself still work
+exactly as before.
 
 ## Known placeholders / TODOs before launch
 
