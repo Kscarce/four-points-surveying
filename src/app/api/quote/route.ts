@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 import { quoteRequestSchema } from "@/lib/quoteSchema";
 import { business } from "@/lib/content";
+import { generateQuotePdf } from "@/lib/generateQuotePdf";
 
 // Basic in-memory rate limiting per server instance. Not a substitute
 // for a real rate limiter behind a CDN, but enough to stop naive form
@@ -73,6 +74,15 @@ export async function POST(request: NextRequest) {
 
   const resend = new Resend(apiKey);
 
+  let pdfBuffer: Buffer | null = null;
+  try {
+    pdfBuffer = await generateQuotePdf(data);
+  } catch (err) {
+    // Don't let a PDF generation failure block the notification email
+    // itself, Matt still needs to hear about the request either way.
+    console.error("Failed to generate quote request PDF:", err);
+  }
+
   const subject = `New quote request: ${data.surveyType} - ${data.propertyAddress}`;
   const textBody = [
     `New quote request from ${business.name} website`,
@@ -100,6 +110,15 @@ export async function POST(request: NextRequest) {
       replyTo: data.email,
       subject,
       text: textBody,
+      attachments: pdfBuffer
+        ? [
+            {
+              filename: `quote-request-${data.name.replace(/[^a-z0-9]+/gi, "-").toLowerCase()}.pdf`,
+              content: pdfBuffer,
+              contentType: "application/pdf",
+            },
+          ]
+        : undefined,
     });
 
     if (error) {
