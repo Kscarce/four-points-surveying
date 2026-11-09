@@ -12,11 +12,9 @@ export const business = {
   basedIn: "Greensboro, NC",
   mailingAddress: "P.O. Box 986, Summerfield, NC 27358",
   hours: "Monday - Friday, 8:00am to 5:00pm",
-  // TODO: confirm the real inbox before launch. The live site obfuscates
-  // its email against scrapers, so this is a placeholder, not the real
-  // address. Also used as the "reply to" / notification target for the
-  // quote form until a QUOTE_NOTIFY_EMAIL env var is set.
-  email: "PLACEHOLDER-confirm-real-email@4ptss.com",
+  // Also used as the "reply to" / notification target for the quote
+  // form until a QUOTE_NOTIFY_EMAIL env var is set.
+  email: "matt@4ptss.com",
   team: [
     { name: "Matt", role: "Surveyor", phone: "336.669.0209", preferred: true },
     { name: "Jon", role: "Surveyor", phone: "336.669.7741", preferred: false },

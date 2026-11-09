@@ -53,25 +53,16 @@ QUOTE_NOTIFY_EMAIL=the-real-inbox-to-receive-requests@example.com
 ```
 
 `QUOTE_FROM_EMAIL` needs to be on a domain verified in Resend. `QUOTE_NOTIFY_EMAIL`
-is where new quote requests land, if unset it falls back to the
-placeholder email in `src/lib/content.ts`, which **should be replaced**
-before this goes live.
+is where new quote requests land, if unset it falls back to
+`business.email` in `src/lib/content.ts` (`matt@4ptss.com`).
 
 ## Known placeholders / TODOs before launch
 
 A few things are intentionally stubbed because the real material wasn't
 available yet, grep for `TODO` to find them in code, but the main ones:
 
-- **Business email** (`src/lib/content.ts`): the live site obfuscates
-  its email against scrapers, so the real address was never scraped.
-  Needs the real inbox.
 - **Example survey image** (`src/app/examples/page.tsx`): placeholder
   schematic graphic, swap in the real example survey photo.
-- **Work order PDF** (`src/app/downloads/page.tsx`): the current site
-  links to `work_order_sheet_2024.pdf`, which wasn't available to pull
-  in automatically. Either drop the real file in
-  `/public/forms/work-order.pdf` and link it, or skip straight to the
-  online work order flow planned for Phase 3.
 - **Property records county links** (`src/lib/content.ts`,
   `countyGisLinks`): 4 of 8 counties (Rockingham, Davidson, Stokes,
   Caswell) link to the county's homepage rather than a confirmed
@@ -81,6 +72,23 @@ available yet, grep for `TODO` to find them in code, but the main ones:
   homepage hero. The wordmark variant (`logo-wordmark.jpg`) is saved
   in `/public/brand/` but not yet used anywhere — could replace the
   text wordmark in the header/footer if preferred.
+
+## Work order form
+
+The old site had a "Forms" page where customers could download a
+blank `work_order_sheet_2024.pdf` and fill it out by hand. That page
+has been removed: the real form (saved in `docs/reference/` for
+reference, not published) turned out to be an internal office
+document — price, job type, buyer names, deed/plat references — that
+Matt fills in himself once a job is booked, not something a customer
+fills out. The quote request form on `/contact` already does the
+customer-facing version of this job better (structured fields,
+emailed straight to him, no printing/scanning).
+
+The Phase 3 plan is to use this PDF's fields as the template for an
+auto-generated work order: once Matt accepts a quote, the system
+generates a filled-in work order (from the same field set as the real
+PDF) and emails it, instead of him re-typing everything by hand.
 
 ## Project structure
 
