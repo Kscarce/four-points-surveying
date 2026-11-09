@@ -160,6 +160,22 @@ Without these set, `/admin` isn't reachable and the whole Phase 3 flow
 is simply unavailable — email and the quote form itself still work
 exactly as before.
 
+## Job schedule
+
+A shared calendar at `/admin/schedule`, behind the same staff login as the
+quote requests page. Jobs are entered by hand (the crew decides when to do
+what based on where they already are that day, not something that can be
+automated from a quote), so this is just a calendar view over its own
+"Schedule" tab in the same Google Sheet: date, time, job/customer, assigned
+worker (Matt/Jon/Jerrett/Unassigned), location, notes. Click a day to see or
+add jobs; click a job to edit or delete it. Everyone who signs in at `/admin`
+sees and can edit the same calendar, since there's one shared staff password
+rather than individual logins.
+
+No new env vars needed, it reuses `GOOGLE_SHEET_ID` /
+`GOOGLE_SERVICE_ACCOUNT_EMAIL` / `GOOGLE_SERVICE_ACCOUNT_KEY` and the same
+admin auth as the quote requests page.
+
 ## Known placeholders / TODOs before launch
 
 A few things are intentionally stubbed because the real material wasn't
