@@ -118,6 +118,25 @@ export default function QuoteForm() {
         </div>
       </div>
 
+      <div className="border border-border bg-surface p-4">
+        <p className="text-sm leading-relaxed text-foreground-muted">
+          Every survey includes finding and setting all property corners
+          that aren&apos;t already marked. That&apos;s standard. Some
+          customers also want wood stakes placed along the property
+          lines between corners, not just at the corners themselves.
+          That&apos;s a separate option and usually costs more.
+        </p>
+        <label htmlFor="wantsLineStakes" className="mt-3 flex items-start gap-2.5 text-sm text-foreground">
+          <input
+            id="wantsLineStakes"
+            name="wantsLineStakes"
+            type="checkbox"
+            className="mt-0.5 h-4 w-4 border-border accent-brand"
+          />
+          <span>I&apos;d also like wood stakes set along the property lines, not just at the corners</span>
+        </label>
+      </div>
+
       <div className="grid gap-5 sm:grid-cols-2">
         <div>
           <label htmlFor="acreage" className={labelClass}>Approx. acreage (if known)</label>

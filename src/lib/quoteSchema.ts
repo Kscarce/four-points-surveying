@@ -19,6 +19,12 @@ export const quoteRequestSchema = z.object({
   propertyAddress: z.string().trim().min(5, "Enter the property address").max(400),
   county: z.string().trim().max(100).optional().or(z.literal("")),
   surveyType: z.enum(surveyTypeOptions),
+  // Comes in from a checkbox (FormData gives "on" / undefined), so coerce
+  // rather than require an actual boolean.
+  wantsLineStakes: z.preprocess(
+    (val) => val === "on" || val === true,
+    z.boolean(),
+  ),
   acreage: z.string().trim().max(100).optional().or(z.literal("")),
   timeline: z.string().trim().max(200).optional().or(z.literal("")),
   notes: z.string().trim().max(2000).optional().or(z.literal("")),

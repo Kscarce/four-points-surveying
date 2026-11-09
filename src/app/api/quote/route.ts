@@ -84,6 +84,7 @@ export async function POST(request: NextRequest) {
     `Property address: ${data.propertyAddress}`,
     data.county ? `County: ${data.county}` : null,
     `Survey type: ${data.surveyType}`,
+    `Wood stakes along lines: ${data.wantsLineStakes ? "Yes" : "No (corners only)"}`,
     data.acreage ? `Approx. acreage: ${data.acreage}` : null,
     data.timeline ? `Timeline: ${data.timeline}` : null,
     ``,
