@@ -50,10 +50,10 @@ export const countyGisLinks: {
   { county: "Forsyth", url: "https://www.forsyth.cc/tax/mapping.aspx", verified: true },
   { county: "Alamance", url: "https://www.alamance-nc.com/gis/", verified: true },
   { county: "Randolph", url: "https://www.randolphcountync.gov/255/GIS", verified: true },
-  { county: "Rockingham", url: "https://www.rockinghamcountync.gov/", verified: false },
-  { county: "Davidson", url: "https://www.co.davidson.nc.us/", verified: false },
-  { county: "Stokes", url: "https://www.co.stokes.nc.us/", verified: false },
-  { county: "Caswell", url: "https://www.caswellcountync.gov/", verified: false },
+  { county: "Rockingham", url: "https://www.webgis.net/nc/rockingham/", verified: true },
+  { county: "Davidson", url: "https://davidson-county-hub-for-gis-davidsonco.hub.arcgis.com/", verified: true },
+  { county: "Stokes", url: "https://www.stokescountygis.com/", verified: true },
+  { county: "Caswell", url: "https://www.webgis.net/nc/caswell/", verified: true },
 ];
 
 export const services = [

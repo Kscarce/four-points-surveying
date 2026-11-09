@@ -108,17 +108,15 @@ Vercel's environment variable settings.
 A few things are intentionally stubbed because the real material wasn't
 available yet, grep for `TODO` to find them in code, but the main ones:
 
-- **Example survey image** (`src/app/examples/page.tsx`): placeholder
-  schematic graphic, swap in the real example survey photo.
-- **Property records county links** (`src/lib/content.ts`,
-  `countyGisLinks`): 4 of 8 counties (Rockingham, Davidson, Stokes,
-  Caswell) link to the county's homepage rather than a confirmed
-  direct GIS page, flagged with `verified: false`. Worth a few
-  minutes finding the exact page for each.
+- **Example survey image** (`src/app/examples/page.tsx`): still a
+  placeholder schematic graphic. Needs a real example survey photo
+  from Matt, swap in once we have one.
 - **Logo**: real logo (`logo-mark.jpg`) is in place in the header and
-  homepage hero. The wordmark variant (`logo-wordmark.jpg`) is saved
-  in `/public/brand/` but not yet used anywhere — could replace the
-  text wordmark in the header/footer if preferred.
+  homepage hero. The wordmark variant (`logo-wordmark.jpg`, the bright
+  green "4PTSS.com" graphic) is saved in `/public/brand/` but not used
+  anywhere — it doesn't match the header's "Four Points Surveyors,
+  PLLC" text wordmark, so left as-is for now. Worth a deliberate call
+  on whether it replaces anything, not a drop-in swap.
 
 ## Work order form
 
