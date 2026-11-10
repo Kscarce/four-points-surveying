@@ -141,7 +141,7 @@ export const paymentMethods = [
     description: `Mail to: ${business.name}, ${business.mailingAddress}`,
   },
   {
-    name: "PayPal",
-    description: "Available for your convenience. Contact us for details on sending a PayPal payment.",
+    name: "PayPal, card, or Venmo",
+    description: "Enter your invoice number below to pay online by credit card, PayPal, or Venmo.",
   },
 ] as const;

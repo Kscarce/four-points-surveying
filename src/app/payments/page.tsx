@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Section from "@/components/Section";
+import PayInvoiceForm from "@/components/PayInvoiceForm";
 import { business, paymentMethods } from "@/lib/content";
+import { isPaypalConfigured } from "@/lib/paypal";
 
 export const metadata: Metadata = {
   title: "Payments",
@@ -29,6 +31,12 @@ export default function PaymentsPage() {
           </div>
         ))}
       </div>
+
+      {isPaypalConfigured() && (
+        <div className="mt-10 max-w-md">
+          <PayInvoiceForm />
+        </div>
+      )}
 
       <p className="mt-8 text-sm text-foreground-muted">
         Questions about an invoice or payment? Contact {business.team[0].name}{" "}

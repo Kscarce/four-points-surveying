@@ -183,6 +183,39 @@ No new env vars needed, it reuses `GOOGLE_SHEET_ID` /
 `GOOGLE_SERVICE_ACCOUNT_EMAIL` / `GOOGLE_SERVICE_ACCOUNT_KEY` and the same
 admin auth as the quote requests page.
 
+## Online invoice payment
+
+A "Pay an invoice" form on `/payments`. The customer types in the invoice
+number from their work order, and the site looks it up via PayPal's
+Invoicing API and sends them straight to PayPal's own hosted payment page
+for that invoice, which already supports credit card (guest checkout, no
+PayPal account needed), PayPal balance, and Venmo (US). The site never
+handles card numbers itself, it only finds the right invoice and redirects.
+
+This depends on Matt actually creating each invoice through PayPal's own
+Invoicing (dashboard or app) with the invoice number he writes on the work
+order, since the lookup only works if that number matches a real PayPal
+invoice.
+
+```bash
+# .env.local
+PAYPAL_CLIENT_ID=from_your_paypal_app
+PAYPAL_CLIENT_SECRET=from_your_paypal_app
+PAYPAL_ENV=sandbox   # "live" once ready for real payments
+```
+
+Get these from the [PayPal Developer dashboard](https://developer.paypal.com/dashboard/applications):
+Apps & Credentials → create an app (Merchant, not Platform) → make sure
+**Invoicing** is enabled on it → copy its Client ID and Secret. Start with
+a Sandbox app to test (the business account you test against also needs
+at least one invoice created in PayPal's Sandbox for there to be anything
+to find), then repeat with a Live app and `PAYPAL_ENV=live` once it's
+confirmed working.
+
+Without these two env vars set, `isPaypalConfigured()` returns false and
+the payment form simply doesn't render — the rest of the Payments page
+(cash/check instructions) still shows as before.
+
 ## Known placeholders / TODOs before launch
 
 A few things are intentionally stubbed because the real material wasn't
