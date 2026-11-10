@@ -72,6 +72,12 @@ export async function POST(request: NextRequest) {
             },
           },
         ],
+        // This is payment for a survey job, nothing physical is being
+        // shipped, so tell PayPal to skip its shipping-address step
+        // entirely rather than asking the customer where to ship to.
+        application_context: {
+          shipping_preference: "NO_SHIPPING",
+        },
       }),
     });
 
