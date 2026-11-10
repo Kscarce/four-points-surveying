@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Section from "@/components/Section";
-import PayInvoiceForm from "@/components/PayInvoiceForm";
+import PayNowForm from "@/components/PayNowForm";
 import { business, paymentMethods } from "@/lib/content";
 import { isPaypalConfigured } from "@/lib/paypal";
 
@@ -32,9 +32,9 @@ export default function PaymentsPage() {
         ))}
       </div>
 
-      {isPaypalConfigured() && (
+      {isPaypalConfigured() && process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID && (
         <div className="mt-10 max-w-md">
-          <PayInvoiceForm />
+          <PayNowForm clientId={process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID} />
         </div>
       )}
 

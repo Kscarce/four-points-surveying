@@ -1,30 +1,31 @@
-// Looks up a PayPal invoice by its invoice number and returns the
-// PayPal-hosted link the customer pays it at. The site never handles
-// card numbers or payment details itself - we just find the right
-// invoice and send the customer to PayPal's own payment page for it,
-// which already supports credit card (guest checkout), PayPal
-// balance, and Venmo (US) without any extra integration work here.
+// Lets a customer pay Matt directly from the site: they type in the
+// amount their emailed PDF invoice says they owe and that invoice's
+// number (kept only as a reference note, not matched against
+// anything), then pay by PayPal, Venmo, or a card entered right on
+// the page. This uses PayPal's standard Checkout (Orders API), not
+// the separate Invoicing product, since Matt doesn't create invoices
+// inside PayPal itself, he just emails a PDF and customers used to
+// have to go send him money manually.
 //
 // Required env vars:
-//   PAYPAL_CLIENT_ID
-//   PAYPAL_CLIENT_SECRET
-//   PAYPAL_ENV - "sandbox" (default) or "live"
-//
-// Matt creates each invoice through PayPal's own Invoicing (dashboard
-// or app), and the invoice number he gives the customer on the work
-// order is what gets typed into the site's "Pay an invoice" form.
+//   PAYPAL_CLIENT_ID              - also exposed to the browser as
+//                                    NEXT_PUBLIC_PAYPAL_CLIENT_ID
+//                                    (Client IDs aren't secret, the
+//                                    PayPal JS SDK needs one client-side)
+//   PAYPAL_CLIENT_SECRET          - server-only, never exposed
+//   PAYPAL_ENV                    - "sandbox" (default) or "live"
 
 export function isPaypalConfigured(): boolean {
   return Boolean(process.env.PAYPAL_CLIENT_ID && process.env.PAYPAL_CLIENT_SECRET);
 }
 
-function getApiBase(): string {
+export function getApiBase(): string {
   return process.env.PAYPAL_ENV === "live"
     ? "https://api-m.paypal.com"
     : "https://api-m.sandbox.paypal.com";
 }
 
-async function getAccessToken(): Promise<string> {
+export async function getAccessToken(): Promise<string> {
   const clientId = process.env.PAYPAL_CLIENT_ID;
   const clientSecret = process.env.PAYPAL_CLIENT_SECRET;
   if (!clientId || !clientSecret) {
@@ -50,77 +51,26 @@ async function getAccessToken(): Promise<string> {
   return json.access_token;
 }
 
-type PaypalSearchInvoice = { id: string };
-
-type PaypalSearchResponse = {
-  items?: PaypalSearchInvoice[];
-  total_items?: number;
-};
-
-type PaypalInvoiceDetail = {
-  detail?: {
-    metadata?: {
-      recipient_view_url?: string;
-    };
-  };
-  status?: string;
-};
-
-export type InvoiceLookupResult =
-  | { ok: true; payUrl: string }
-  | { ok: false; reason: "not_found" | "already_paid" | "no_link" };
-
-// Invoice numbers are set by Matt in PayPal and are plain text he
-// writes on the work order, not a secret - but we still only accept
-// a tight character set here to keep the PayPal query well-formed and
-// to avoid passing anything unexpected through to their API.
+// Matt writes this on the PDF invoice he emails, it's just a
+// reference note attached to the PayPal order (shows up on his
+// PayPal transaction so he can match the payment to the invoice),
+// not looked up or verified against anything.
 const INVOICE_NUMBER_PATTERN = /^[A-Za-z0-9/_-]{1,25}$/;
 
 export function isValidInvoiceNumber(value: string): boolean {
   return INVOICE_NUMBER_PATTERN.test(value.trim());
 }
 
-export async function findInvoicePayUrl(invoiceNumber: string): Promise<InvoiceLookupResult> {
-  const accessToken = await getAccessToken();
+// Accepts a decimal amount with up to 2 decimal places, e.g. "450" or
+// "450.50". Matt's invoices are for survey jobs, not micropayments or
+// huge contracts, so a sane range keeps out typos (an extra zero) and
+// placeholder/test values.
+export function isValidAmount(value: string): boolean {
+  if (!/^\d{1,6}(\.\d{1,2})?$/.test(value.trim())) return false;
+  const n = Number(value);
+  return n >= 1 && n <= 50000;
+}
 
-  const searchRes = await fetch(`${getApiBase()}/v2/invoicing/search-invoices?page=1&page_size=2`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ invoice_number: invoiceNumber.trim() }),
-  });
-
-  if (!searchRes.ok) {
-    throw new Error(`PayPal invoice search failed: ${searchRes.status} ${await searchRes.text()}`);
-  }
-
-  const searchJson = (await searchRes.json()) as PaypalSearchResponse;
-  const match = searchJson.items?.[0];
-
-  if (!match) {
-    return { ok: false, reason: "not_found" };
-  }
-
-  const detailRes = await fetch(`${getApiBase()}/v2/invoicing/invoices/${match.id}`, {
-    headers: { Authorization: `Bearer ${accessToken}` },
-  });
-
-  if (!detailRes.ok) {
-    throw new Error(`PayPal invoice detail failed: ${detailRes.status} ${await detailRes.text()}`);
-  }
-
-  const detail = (await detailRes.json()) as PaypalInvoiceDetail;
-
-  if (detail.status === "PAID" || detail.status === "MARKED_AS_PAID") {
-    return { ok: false, reason: "already_paid" };
-  }
-
-  const payUrl = detail.detail?.metadata?.recipient_view_url;
-  if (!payUrl) {
-    return { ok: false, reason: "no_link" };
-  }
-
-  return { ok: true, payUrl };
+export function normalizeAmount(value: string): string {
+  return Number(value).toFixed(2);
 }

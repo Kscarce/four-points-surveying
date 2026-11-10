@@ -183,38 +183,52 @@ No new env vars needed, it reuses `GOOGLE_SHEET_ID` /
 `GOOGLE_SERVICE_ACCOUNT_EMAIL` / `GOOGLE_SERVICE_ACCOUNT_KEY` and the same
 admin auth as the quote requests page.
 
-## Online invoice payment
+## Online payment
 
-A "Pay an invoice" form on `/payments`. The customer types in the invoice
-number from their work order, and the site looks it up via PayPal's
-Invoicing API and sends them straight to PayPal's own hosted payment page
-for that invoice, which already supports credit card (guest checkout, no
-PayPal account needed), PayPal balance, and Venmo (US). The site never
-handles card numbers itself, it only finds the right invoice and redirects.
+A "Pay now" form on `/payments`. Matt emails each customer a PDF invoice
+(not through PayPal itself) and they used to have to send him money
+manually through PayPal. Now the customer types in the amount they owe and
+that invoice's number (kept only as a reference note attached to the
+payment, not looked up or verified against anything), then pays by card,
+PayPal, or Venmo, right on the page. Card entry uses PayPal's own
+hosted card fields (via PayPal's standard Checkout/Orders API, not the
+separate Invoicing product), so the site itself never touches raw card
+numbers.
 
-This depends on Matt actually creating each invoice through PayPal's own
-Invoicing (dashboard or app) with the invoice number he writes on the work
-order, since the lookup only works if that number matches a real PayPal
-invoice.
+The order is created server-side with the entered amount and invoice
+number (`src/app/api/paypal/create-order`), and captured server-side after
+the customer approves (`src/app/api/paypal/capture-order`) rather than
+trusting the browser alone, which is PayPal's recommended, tamper-resistant
+pattern. On a successful capture, Matt gets an email (reusing
+`RESEND_API_KEY` / `QUOTE_FROM_EMAIL` / `QUOTE_NOTIFY_EMAIL` from the quote
+form above) with the amount, invoice number, payer name/email, and PayPal
+transaction id, so he can match it to the right job.
 
 ```bash
 # .env.local
 PAYPAL_CLIENT_ID=from_your_paypal_app
+NEXT_PUBLIC_PAYPAL_CLIENT_ID=same_value_as_above
 PAYPAL_CLIENT_SECRET=from_your_paypal_app
 PAYPAL_ENV=sandbox   # "live" once ready for real payments
 ```
 
-Get these from the [PayPal Developer dashboard](https://developer.paypal.com/dashboard/applications):
-Apps & Credentials → create an app (Merchant, not Platform) → make sure
-**Invoicing** is enabled on it → copy its Client ID and Secret. Start with
-a Sandbox app to test (the business account you test against also needs
-at least one invoice created in PayPal's Sandbox for there to be anything
-to find), then repeat with a Live app and `PAYPAL_ENV=live` once it's
-confirmed working.
+`PAYPAL_CLIENT_ID` and `NEXT_PUBLIC_PAYPAL_CLIENT_ID` are the same value
+twice - Client IDs aren't secret, the `NEXT_PUBLIC_` one is what lets
+PayPal's buttons render in the customer's browser. `PAYPAL_CLIENT_SECRET`
+is server-only and should never be exposed with a `NEXT_PUBLIC_` prefix.
 
-Without these two env vars set, `isPaypalConfigured()` returns false and
-the payment form simply doesn't render — the rest of the Payments page
-(cash/check instructions) still shows as before.
+Get these from the [PayPal Developer dashboard](https://developer.paypal.com/dashboard/applications):
+Apps & Credentials → create an app (Merchant, not Platform) → copy its
+Client ID and Secret. The standard Checkout/Orders API this uses is
+enabled by default, no extra product toggle needed (unlike the Invoicing
+API this originally used before the approach changed). Start with a
+Sandbox app to test, then repeat with a Live app and `PAYPAL_ENV=live`
+once it's confirmed working.
+
+Without `PAYPAL_CLIENT_ID` and `PAYPAL_CLIENT_SECRET` set,
+`isPaypalConfigured()` returns false and the payment form simply doesn't
+render — the rest of the Payments page (cash/check instructions) still
+shows as before.
 
 ## Known placeholders / TODOs before launch
 
