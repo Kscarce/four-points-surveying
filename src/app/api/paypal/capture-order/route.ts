@@ -23,19 +23,29 @@ type CaptureResponse = {
 async function notifyMattOfPayment(capture: CaptureResponse) {
   const apiKey = process.env.RESEND_API_KEY;
   const fromAddress = process.env.QUOTE_FROM_EMAIL;
-  if (!apiKey || !fromAddress) return; // Email is an enhancement here, not required.
+  if (!apiKey || !fromAddress) {
+    // Temporary diagnostic: this path was silently swallowing the fact
+    // that one of these wasn't set, which made a misconfigured deploy
+    // look identical to a successful, quiet send in the logs.
+    console.error(
+      "Skipping payment notification email: missing",
+      !apiKey && !fromAddress ? "RESEND_API_KEY and QUOTE_FROM_EMAIL" : !apiKey ? "RESEND_API_KEY" : "QUOTE_FROM_EMAIL",
+    );
+    return;
+  }
 
   const unit = capture.purchase_units?.[0];
   const paymentCapture = unit?.payments?.captures?.[0];
   const payerName = [capture.payer?.name?.given_name, capture.payer?.name?.surname]
     .filter(Boolean)
     .join(" ");
+  const notifyTo = process.env.QUOTE_NOTIFY_EMAIL || business.email;
 
   const resend = new Resend(apiKey);
   try {
-    await resend.emails.send({
+    const result = await resend.emails.send({
       from: fromAddress,
-      to: process.env.QUOTE_NOTIFY_EMAIL || business.email,
+      to: notifyTo,
       subject: `Payment received${unit?.invoice_id ? ` - Invoice ${unit.invoice_id}` : ""}`,
       text: [
         `A payment came in through the website.`,
@@ -51,10 +61,18 @@ async function notifyMattOfPayment(capture: CaptureResponse) {
         .filter(Boolean)
         .join("\n"),
     });
+    // Temporary diagnostic: Resend's SDK resolves successfully even
+    // when the API rejects the send (e.g. bad key, unverified domain)
+    // - the actual problem is in result.error, not a thrown exception.
+    if (result.error) {
+      console.error("Resend rejected the payment notification email:", notifyTo, result.error);
+    } else {
+      console.log("Payment notification email sent:", notifyTo, result.data?.id);
+    }
   } catch (err) {
     // Don't fail the payment response over a notification email issue,
     // the money already moved, this is just a heads-up to Matt.
-    console.error("Failed to send payment notification email:", err);
+    console.error("Failed to send payment notification email:", notifyTo, err);
   }
 }
 
