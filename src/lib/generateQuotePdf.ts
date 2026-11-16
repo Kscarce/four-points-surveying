@@ -29,7 +29,7 @@ function buildRows(data: QuoteRequest): Row[] {
     value: data.wantsLineStakes ? "Yes" : "No (corners only)",
   });
   if (data.acreage) rows.push({ label: "Approx. acreage", value: data.acreage });
-  if (data.timeline) rows.push({ label: "Timeline", value: data.timeline });
+  if (data.timeline) rows.push({ label: "Date needed by", value: data.timeline });
   if (data.notes) rows.push({ label: "Notes", value: data.notes });
   return rows;
 }

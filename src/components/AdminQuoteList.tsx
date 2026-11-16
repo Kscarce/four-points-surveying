@@ -78,7 +78,7 @@ export default function AdminQuoteList({
                 </p>
                 {quote.county && <p className="text-xs text-foreground-muted">{quote.county} County</p>}
                 {quote.acreage && <p className="text-xs text-foreground-muted">~{quote.acreage} acres</p>}
-                {quote.timeline && <p className="text-xs text-foreground-muted">Timeline: {quote.timeline}</p>}
+                {quote.timeline && <p className="text-xs text-foreground-muted">Date needed by: {quote.timeline}</p>}
                 {quote.notes && (
                   <p className="mt-2 max-w-xl text-sm text-foreground-muted">&ldquo;{quote.notes}&rdquo;</p>
                 )}

@@ -114,7 +114,7 @@ export async function POST(request: NextRequest) {
     `Survey type: ${data.surveyType}`,
     `Wood stakes along lines: ${data.wantsLineStakes ? "Yes" : "No (corners only)"}`,
     data.acreage ? `Approx. acreage: ${data.acreage}` : null,
-    data.timeline ? `Timeline: ${data.timeline}` : null,
+    data.timeline ? `Date needed by: ${data.timeline}` : null,
     ``,
     data.notes ? `Notes:\n${data.notes}` : null,
   ]

@@ -137,15 +137,12 @@ export default function QuoteForm() {
         </label>
       </div>
 
-      <div className="grid gap-5 sm:grid-cols-2">
-        <div>
-          <label htmlFor="acreage" className={labelClass}>Approx. acreage (if known)</label>
-          <input id="acreage" name="acreage" type="text" className={fieldClass} placeholder="e.g. 0.5 acres" />
-        </div>
-        <div>
-          <label htmlFor="timeline" className={labelClass}>Timeline</label>
-          <input id="timeline" name="timeline" type="text" className={fieldClass} placeholder="e.g. closing in 3 weeks" />
-        </div>
+      <div>
+        <label htmlFor="timeline" className={labelClass}>Date needed by (if any)</label>
+        <input id="timeline" name="timeline" type="text" className={fieldClass} placeholder="e.g. 12/15, or no rush" />
+        <p className="mt-1.5 text-xs text-foreground-muted">
+          Surveys are typically completed within 2-3 weeks.
+        </p>
       </div>
 
       <div>

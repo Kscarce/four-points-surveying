@@ -74,7 +74,7 @@ export default async function WorkOrderPage({
               ["Type of survey", quote.surveyType],
               ["Wood stakes along lines", quote.wantsLineStakes ? "Yes" : "No (corners only)"],
               quote.acreage ? ["Approx. acreage", quote.acreage] : null,
-              quote.timeline ? ["Timeline", quote.timeline] : null,
+              quote.timeline ? ["Date needed by", quote.timeline] : null,
               quote.notes ? ["Notes", quote.notes] : null,
             ].filter((row): row is [string, string] => row !== null)
           ).map(([label, value]) => (
