@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Section from "@/components/Section";
-import SurveyPlaceholder from "@/components/SurveyPlaceholder";
 
 export const metadata: Metadata = {
   title: "Examples",
@@ -18,12 +18,17 @@ export default function ExamplesPage() {
         the property corners, making it easy to relocate them later.
       </p>
 
-      <div className="mt-8 max-w-xl">
-        <SurveyPlaceholder />
-        {/* TODO: replace with the real example survey photo/scan once
-            supplied, e.g. /public/examples/lot-survey-example.jpg */}
-        <p className="mt-2 text-xs text-foreground-muted">
-          Placeholder graphic. Swap in the real example survey image here.
+      <div className="mt-8 max-w-xl overflow-hidden rounded border border-border bg-surface">
+        <Image
+          src="/examples/lot-survey-example.png"
+          alt="Example lot survey map, with the client's name and address blurred for privacy"
+          width={690}
+          height={1065}
+          className="h-auto w-full"
+        />
+        <p className="border-t border-border px-3 py-2 text-xs text-foreground-muted">
+          Client name, address, and deed/PIN details are blurred for privacy.
+          Your survey will show your own property&apos;s information in full.
         </p>
       </div>
     </Section>
