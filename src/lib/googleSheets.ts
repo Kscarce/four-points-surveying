@@ -110,7 +110,11 @@ export async function appendQuoteRequestRow(
     spreadsheetId: getSheetId(),
     range: SHEET_RANGE,
     valueInputOption: "USER_ENTERED",
-    insertDataOption: "INSERT_ROWS",
+    // OVERWRITE (not INSERT_ROWS) writes into the next empty row rather
+    // than inserting a brand new one - inserting right under the header
+    // row makes Sheets copy the header's formatting onto every new row,
+    // which is why rows were showing up colored like the header.
+    insertDataOption: "OVERWRITE",
     requestBody: { values: [row] },
   });
 }
