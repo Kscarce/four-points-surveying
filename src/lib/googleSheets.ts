@@ -109,7 +109,13 @@ export async function appendQuoteRequestRow(
   await sheets.spreadsheets.values.append({
     spreadsheetId: getSheetId(),
     range: SHEET_RANGE,
-    valueInputOption: "USER_ENTERED",
+    // RAW, not USER_ENTERED: USER_ENTERED tells Sheets to parse values
+    // the way a human typing them would, which silently converts a
+    // date-looking string (the Timestamp, or a "date needed by" like
+    // "12/01") into a date serial number. With no date format applied
+    // to those columns, that just displayed as a meaningless decimal.
+    // RAW stores every value as the exact literal text we send.
+    valueInputOption: "RAW",
     // OVERWRITE (not INSERT_ROWS) writes into the next empty row rather
     // than inserting a brand new one - inserting right under the header
     // row makes Sheets copy the header's formatting onto every new row,
