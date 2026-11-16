@@ -211,7 +211,10 @@ async function updateRowByQuoteId(
 
   await sheets.spreadsheets.values.batchUpdate({
     spreadsheetId: getSheetId(),
-    requestBody: { valueInputOption: "USER_ENTERED", data },
+    // RAW, not USER_ENTERED - same fix as appendQuoteRequestRow/
+    // scheduleSheets.ts, so Sheets doesn't try to auto-parse something
+    // like "Signed At" into a date serial.
+    requestBody: { valueInputOption: "RAW", data },
   });
 }
 
@@ -240,5 +243,15 @@ export async function recordDecline(quoteId: string, reason: string): Promise<vo
   await updateRowByQuoteId(quoteId, {
     Status: "Declined",
     "Decline Reason": reason,
+  });
+}
+
+// Used by the complete-past-jobs cron: flips a quote to "Completed" once
+// its linked schedule entry's date has passed. Only ever called for
+// quotes still in "Accepted" status (checked by the caller), so this
+// doesn't need to re-check status itself.
+export async function markQuoteCompleted(quoteId: string): Promise<void> {
+  await updateRowByQuoteId(quoteId, {
+    Status: "Completed",
   });
 }

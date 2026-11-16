@@ -83,6 +83,7 @@ const emptyForm = (date: string): FormState => ({
   worker: "Unassigned",
   location: "",
   notes: "",
+  quoteId: "",
 });
 
 export default function ScheduleCalendar({
@@ -159,10 +160,13 @@ export default function ScheduleCalendar({
       worker: entry.worker as FormState["worker"],
       location: entry.location,
       notes: entry.notes,
+      quoteId: entry.quoteId,
     });
-    // An existing entry isn't linked back to a specific quote, so edit
-    // always starts in manual mode with the current text filled in.
-    setJobSelection(MANUAL_JOB);
+    // If this entry was scheduled from an accepted quote (and that quote
+    // is still in the dropdown), start the dropdown on it instead of
+    // always forcing manual mode.
+    const linked = entry.quoteId && acceptedQuotes.some((q) => q.quoteId === entry.quoteId);
+    setJobSelection(linked ? entry.quoteId! : MANUAL_JOB);
     setFormOpen(true);
     setError("");
   }
@@ -175,7 +179,10 @@ export default function ScheduleCalendar({
 
   function handleJobSelect(value: string) {
     setJobSelection(value);
-    if (value === MANUAL_JOB) return;
+    if (value === MANUAL_JOB) {
+      setForm((f) => ({ ...f, quoteId: "" }));
+      return;
+    }
     const quote = acceptedQuotes.find((q) => q.quoteId === value);
     if (!quote) return;
     setForm((f) => ({
@@ -183,6 +190,7 @@ export default function ScheduleCalendar({
       job: jobLabel(quote),
       location: quote.propertyAddress,
       county: matchCounty(quote.county ?? "") || f.county,
+      quoteId: quote.quoteId,
     }));
   }
 

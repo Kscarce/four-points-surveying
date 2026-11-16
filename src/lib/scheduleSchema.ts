@@ -35,6 +35,10 @@ export const scheduleEntrySchema = z.object({
   worker: z.enum(scheduleWorkerOptions),
   location: z.string().trim().max(400).optional().or(z.literal("")),
   notes: z.string().trim().max(2000).optional().or(z.literal("")),
+  // Links this entry back to the quote request it was scheduled from, so
+  // the cron job can flip that quote to "Completed" once the date passes.
+  // Empty for manually-typed jobs that don't correspond to a quote.
+  quoteId: z.string().trim().max(100).optional().or(z.literal("")),
 });
 
 export type ScheduleEntryInput = z.infer<typeof scheduleEntrySchema>;

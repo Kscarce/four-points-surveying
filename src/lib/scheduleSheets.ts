@@ -28,9 +28,10 @@ const COLUMNS = [
   "Assigned Worker",
   "Location",
   "Notes",
+  "Quote ID",
 ] as const;
 
-const SHEET_RANGE = `Schedule!A:${String.fromCharCode(64 + COLUMNS.length)}`; // A:H
+const SHEET_RANGE = `Schedule!A:${String.fromCharCode(64 + COLUMNS.length)}`; // A:I
 
 function getAuth() {
   const email = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
@@ -62,6 +63,7 @@ function rowToScheduleEntry(row: string[]): ScheduleEntry {
     worker: (get("Assigned Worker") || "Unassigned") as ScheduleEntry["worker"],
     location: get("Location"),
     notes: get("Notes"),
+    quoteId: get("Quote ID"),
   };
 }
 
@@ -98,6 +100,7 @@ export async function createScheduleEntry(
     data.worker,
     data.location ?? "",
     data.notes ?? "",
+    data.quoteId ?? "",
   ];
 
   await sheets.spreadsheets.values.append({
@@ -120,6 +123,7 @@ export async function createScheduleEntry(
     county: data.county ?? "",
     location: data.location ?? "",
     notes: data.notes ?? "",
+    quoteId: data.quoteId ?? "",
   };
 }
 
@@ -136,7 +140,7 @@ export async function updateScheduleEntry(
 
   await sheets.spreadsheets.values.update({
     spreadsheetId: getSheetId(),
-    range: `Schedule!B${sheetRowNumber}:H${sheetRowNumber}`,
+    range: `Schedule!B${sheetRowNumber}:I${sheetRowNumber}`,
     valueInputOption: "RAW",
     requestBody: {
       values: [[
@@ -147,6 +151,7 @@ export async function updateScheduleEntry(
         data.worker,
         data.location ?? "",
         data.notes ?? "",
+        data.quoteId ?? "",
       ]],
     },
   });
