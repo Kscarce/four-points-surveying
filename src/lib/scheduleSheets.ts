@@ -103,8 +103,13 @@ export async function createScheduleEntry(
   await sheets.spreadsheets.values.append({
     spreadsheetId: getSheetId(),
     range: SHEET_RANGE,
-    valueInputOption: "USER_ENTERED",
-    insertDataOption: "INSERT_ROWS",
+    // RAW (not USER_ENTERED) so Sheets doesn't auto-parse the date
+    // string into a serial number, the same bug that garbled the
+    // quote request Timestamp/Timeline columns. OVERWRITE (not
+    // INSERT_ROWS) so the new row doesn't inherit the header row's
+    // formatting - same fix as appendQuoteRequestRow below.
+    valueInputOption: "RAW",
+    insertDataOption: "OVERWRITE",
     requestBody: { values: [row] },
   });
 
@@ -132,7 +137,7 @@ export async function updateScheduleEntry(
   await sheets.spreadsheets.values.update({
     spreadsheetId: getSheetId(),
     range: `Schedule!B${sheetRowNumber}:H${sheetRowNumber}`,
-    valueInputOption: "USER_ENTERED",
+    valueInputOption: "RAW",
     requestBody: {
       values: [[
         data.date,
