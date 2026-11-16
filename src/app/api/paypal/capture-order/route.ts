@@ -3,6 +3,24 @@ import { Resend } from "resend";
 import { getAccessToken, getApiBase, isPaypalConfigured } from "@/lib/paypal";
 import { business } from "@/lib/content";
 
+// Mirrors the rate limiting on create-order: this still hits PayPal's
+// API on every call (a token fetch plus the capture itself), so it
+// deserves the same abuse/cost protection even though a flood of junk
+// requests here can't actually move money.
+const submissionLog = new Map<string, number[]>();
+const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
+const RATE_LIMIT_MAX = 15;
+
+function isRateLimited(ip: string): boolean {
+  const now = Date.now();
+  const timestamps = (submissionLog.get(ip) ?? []).filter(
+    (t) => now - t < RATE_LIMIT_WINDOW_MS,
+  );
+  timestamps.push(now);
+  submissionLog.set(ip, timestamps);
+  return timestamps.length > RATE_LIMIT_MAX;
+}
+
 type CaptureResponse = {
   status?: string;
   purchase_units?: Array<{
@@ -77,6 +95,12 @@ async function notifyMattOfPayment(capture: CaptureResponse) {
 }
 
 export async function POST(request: NextRequest) {
+  const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+
+  if (isRateLimited(ip)) {
+    return NextResponse.json({ error: "Too many requests. Please try again later." }, { status: 429 });
+  }
+
   if (!isPaypalConfigured()) {
     return NextResponse.json({ error: "Online payment isn't set up yet on this deployment." }, { status: 503 });
   }
