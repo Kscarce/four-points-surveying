@@ -28,6 +28,7 @@ type CaptureResponse = {
     payments?: {
       captures?: Array<{
         id: string;
+        invoice_id?: string;
         amount?: { value: string; currency_code: string };
       }>;
     };
@@ -54,6 +55,10 @@ async function notifyMattOfPayment(capture: CaptureResponse) {
 
   const unit = capture.purchase_units?.[0];
   const paymentCapture = unit?.payments?.captures?.[0];
+  // PayPal echoes invoice_id back on the capture object itself, not
+  // reliably on the purchase_unit - check both so this doesn't go
+  // missing again if that ever shifts back.
+  const invoiceId = paymentCapture?.invoice_id || unit?.invoice_id;
   const payerName = [capture.payer?.name?.given_name, capture.payer?.name?.surname]
     .filter(Boolean)
     .join(" ");
@@ -64,11 +69,11 @@ async function notifyMattOfPayment(capture: CaptureResponse) {
     const result = await resend.emails.send({
       from: fromAddress,
       to: notifyTo,
-      subject: `Payment received${unit?.invoice_id ? ` - Invoice ${unit.invoice_id}` : ""}`,
+      subject: `Payment received${invoiceId ? ` - Invoice ${invoiceId}` : ""}`,
       text: [
         `A payment came in through the website.`,
         ``,
-        unit?.invoice_id ? `Invoice number: ${unit.invoice_id}` : null,
+        invoiceId ? `Invoice number: ${invoiceId}` : null,
         paymentCapture?.amount
           ? `Amount: $${paymentCapture.amount.value} ${paymentCapture.amount.currency_code}`
           : null,
