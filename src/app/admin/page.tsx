@@ -29,7 +29,18 @@ export default async function AdminPage() {
     );
   }
 
-  const quotes = await getOpenQuoteRequests();
+  // A Sheets hiccup here shouldn't crash the whole page - that's what
+  // was making the login screen look stuck forever (the navigation to
+  // /admin never finished, so "Signing in..." never cleared, with no
+  // error ever shown).
+  let quotes: Awaited<ReturnType<typeof getOpenQuoteRequests>> = [];
+  let loadError: string | null = null;
+  try {
+    quotes = await getOpenQuoteRequests();
+  } catch (err) {
+    console.error("Failed to load open quote requests from Google Sheets:", err);
+    loadError = "Couldn't load quote requests from the Sheet right now. Try refreshing in a moment.";
+  }
 
   return (
     <Section>
@@ -49,9 +60,13 @@ export default async function AdminPage() {
         Set a price to email the customer a link to review and accept or decline.
         Already-quoted requests stay here until they&apos;re accepted or declined.
       </p>
-      <div className="mt-8">
-        <AdminQuoteList initialQuotes={quotes} />
-      </div>
+      {loadError ? (
+        <p className="mt-8 text-sm text-red-600">{loadError}</p>
+      ) : (
+        <div className="mt-8">
+          <AdminQuoteList initialQuotes={quotes} />
+        </div>
+      )}
     </Section>
   );
 }

@@ -28,6 +28,11 @@ function LoginForm() {
         setSubmitting(false);
         return;
       }
+      // Clear the "Signing in..." state now rather than waiting on the
+      // navigation to unmount this component - if the destination page
+      // is at all slow to load, this was leaving the button stuck on
+      // "Signing in..." with no feedback either way.
+      setSubmitting(false);
       router.push(searchParams.get("next") || "/admin");
       router.refresh();
     } catch {
