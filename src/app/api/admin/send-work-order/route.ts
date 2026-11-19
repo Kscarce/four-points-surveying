@@ -4,6 +4,7 @@ import { z } from "zod";
 import { business } from "@/lib/content";
 import { getQuoteRequestById, setQuotePriceAndSend } from "@/lib/googleSheets";
 import { createWorkOrderToken, isWorkOrderTokenConfigured } from "@/lib/workOrderToken";
+import { escapeHtml } from "@/lib/escapeHtml";
 
 const bodySchema = z.object({
   quoteId: z.string().min(1),
@@ -70,6 +71,24 @@ export async function POST(request: NextRequest) {
       `This link is good for 30 days. Questions? Call or text ${business.team[0].name} at ${business.team[0].phone}.`,
       ``,
       `- ${business.shortName}`,
+    ].join("\n"),
+    // A plain-text-only email relies entirely on the recipient's mail
+    // app auto-detecting the bare URL above and turning it into a tap
+    // target - several mail clients/webmail providers don't do that
+    // reliably, which silently strands the customer with no way to
+    // accept. The HTML part below guarantees a real clickable button,
+    // with the same URL repeated as plain text under it as a fallback.
+    html: [
+      `<p>Hi ${escapeHtml(quote.name)},</p>`,
+      `<p>Here's the price for the survey you requested at ${escapeHtml(quote.propertyAddress)}: <strong>$${escapeHtml(price)}</strong>.</p>`,
+      `<p>Review the details and accept or decline below:</p>`,
+      `<p>`,
+      `<a href="${workOrderUrl}" style="display:inline-block;padding:12px 24px;background-color:#008001;color:#ffffff;text-decoration:none;border-radius:4px;font-weight:600;">Review your quote</a>`,
+      `</p>`,
+      `<p style="font-size:13px;color:#555555;">Or copy and paste this link into your browser:<br>`,
+      `<a href="${workOrderUrl}">${workOrderUrl}</a></p>`,
+      `<p>This link is good for 30 days. Questions? Call or text ${escapeHtml(business.team[0].name)} at ${escapeHtml(business.team[0].phone)}.</p>`,
+      `<p>- ${escapeHtml(business.shortName)}</p>`,
     ].join("\n"),
   });
 
